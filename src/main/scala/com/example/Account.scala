@@ -21,3 +21,13 @@ object AccountId {
 }
 
 case class AccountId(id: String)
+
+object TransactionId {
+  var currentId = 0
+  def apply(): TransactionId = {
+    currentId = currentId + 1
+    TransactionId(currentId.toString)
+  }
+}
+
+case class TransactionId(id: String)
