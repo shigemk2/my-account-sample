@@ -31,3 +31,10 @@ object TransactionId {
 }
 
 case class TransactionId(id: String)
+
+case class Transaction(transactionId: TransactionId, amount: Money)
+
+case class AccountBalance(accountId: AccountId, amount: Money)
+case class Deposit(transactionId: TransactionId, amount: Money)
+case class QueryBalance()
+case class Withdraw(transactionId: TransactionId, amount: Money)
