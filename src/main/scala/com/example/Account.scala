@@ -6,6 +6,28 @@ import com.example._
 import scala.collection.mutable.Map
 
 object AccountDriver extends CompletableApp(17) {
+  val account = system.actorOf(Props(classOf[Account], AccountId(), "account"))
+
+  val deposit1 = Deposit(TransactionId(), Money(100))
+  account ! deposit1
+  account ! QueryBalance()
+  account ! deposit1
+  account ! Deposit(TransactionId(), Money(20))
+  account ! QueryBalance()
+  account ! deposit1
+  account ! Withdraw(TransactionId(), Money(50))
+  account ! QueryBalance()
+  account ! deposit1
+  account ! Deposit(TransactionId(), Money(70))
+  account ! QueryBalance()
+  account ! deposit1
+  account ! Withdraw(TransactionId(), Money(100))
+  account ! QueryBalance()
+  account ! deposit1
+  account ! Deposit(TransactionId(), Money(10))
+  account ! QueryBalance()
+
+  awaitCompletion
 }
 
 case class Money(value: Double) {
