@@ -3,6 +3,8 @@ package com.example
 import akka.actor._
 import com.example._
 
+import scala.collection.mutable.Map
+
 object AccountDriver extends CompletableApp(17) {
 }
 
@@ -38,3 +40,35 @@ case class AccountBalance(accountId: AccountId, amount: Money)
 case class Deposit(transactionId: TransactionId, amount: Money)
 case class QueryBalance()
 case class Withdraw(transactionId: TransactionId, amount: Money)
+
+class Account(accountId: AccountId) extends Actor {
+  val transactions = Map.empty[TransactionId, Transaction]
+
+  def receive = {
+    case deposit: Deposit =>
+      val transaction = Transaction(deposit.transactionId, deposit.amount)
+      println(s"Deposit: $transaction")
+      transactions += (deposit.transactionId -> transaction)
+      AccountDriver.completedStep()
+    case withdraw: Withdraw =>
+      val transaction = Transaction(withdraw.transactionId, withdraw.amount.negative)
+      println(s"Withdraw: $transaction")
+      transactions += (withdraw.transactionId -> transaction)
+      AccountDriver.completedStep()
+    case query: QueryBalance =>
+      sender ! calculateBalance()
+      AccountDriver.completedStep()
+  }
+
+  def calculateBalance(): AccountBalance = {
+    var amount = Money(0)
+
+    transactions.values map { transaction =>
+      amount = amount + transaction.amount
+    }
+
+    println(s"Balance: $amount")
+
+    AccountBalance(accountId, amount)
+  }
+}
